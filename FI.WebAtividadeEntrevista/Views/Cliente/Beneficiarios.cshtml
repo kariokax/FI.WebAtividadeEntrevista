@@ -1,0 +1,50 @@
+﻿@section scripts{
+    @Scripts.Render("~/bundles/ListBeneficiarios")
+}
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cadastroBeneficiarioModal">
+    Beneficiários
+</button>
+
+<div class="modal fade" id="cadastroBeneficiarioModal" tabindex="-1" role="dialog" aria-labelledby="cadastroBeneficiarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastroBeneficiarioModalLabel">Beneficiários</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formCadastroBeneficiario" method="post">
+                    <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="CpfBeneficiario">CPF:</label>
+                        <input required="required" type="text" class="form-control" id="CpfBeneficiario" name="CpfBeneficiario" placeholder="Ex.: 010.011.111-00" maxlength="14">
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <div class="col-md-4">
+                        <label for="NomeBeneficiario">Nome:</label>
+                        <input required="required" type="text" class="form-control" id="NomeBeneficiario" name="NomeBeneficiario" placeholder="Ex.: Maria" maxlength="50">
+                    </div>
+                    </div>
+                    <button class="btn btn-success" id="salvarBeneficiario">Salvar</button>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>CPF</th>
+                                <th>Nome</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaBeneficiarios">
+                        </tbody>
+                    </table>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

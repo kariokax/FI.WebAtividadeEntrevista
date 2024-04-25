@@ -3,12 +3,24 @@
     ViewBag.Title = "Alterar Cliente";
 }
 @section scripts{
-<script>
+    <script>
         var urlPost = '@Url.Action("Alterar", "Cliente", new { area = "" })';
+        var urlExclusao = '@Url.Action("ExcluirBeneficiario", "Beneficiario")';
+        var urlConsulta = '@Url.Action("ConsultarBeneficiario", "Beneficiario")';
+        var urlConsultaList = '@Url.Action("ConsultarBeneficiarios", "Beneficiario")';
+        var urlAlterar = '@Url.Action("AlterarBeneficiario", "Beneficiario")';
         var obj = @Html.Raw(Json.Encode(Model));
         var urlRetorno = '@Url.Action("Index", "Cliente", new { area = "" })';
-</script>
+        var beneficiarios = [];
+        var idBeneficiario = 0;
+        var idCliente = 0;
+    </script>
     @Scripts.Render("~/bundles/altClientes")
+    @Scripts.Render("~/bundles/inputmask")
+    @Scripts.Render("~/bundles/MaskCPF")
+    @Scripts.Render("~/bundles/GridBeneficiarios")
+    @*@Scripts.Render("~/bundles/ListBeneficiarios")*@
 }
 <h2>@Html.Raw(ViewBag.Title)</h2>
 @Html.Partial("Forms")
+@Html.Partial("Beneficiarios")

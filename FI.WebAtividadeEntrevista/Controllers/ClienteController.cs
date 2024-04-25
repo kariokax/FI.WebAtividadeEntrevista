@@ -3,9 +3,12 @@ using WebAtividadeEntrevista.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using FI.AtividadeEntrevista.DML;
+using WebAtividadeEntrevista.Helpers;
+using System.Reflection;
 
 namespace WebAtividadeEntrevista.Controllers
 {
@@ -26,7 +29,13 @@ namespace WebAtividadeEntrevista.Controllers
         public JsonResult Incluir(ClienteModel model)
         {
             BoCliente bo = new BoCliente();
-            
+
+            if (!CpfHelper.CpfIsValid(model.CPF))
+                ModelState.AddModelError("CPF", "CPF inválido.");
+
+            if (bo.VerificarExistencia(model.CPF, model.Id))
+                ModelState.AddModelError("CPF", "CPF Já está cadastrado.");
+
             if (!this.ModelState.IsValid)
             {
                 List<string> erros = (from item in ModelState.Values
@@ -49,10 +58,10 @@ namespace WebAtividadeEntrevista.Controllers
                     Nacionalidade = model.Nacionalidade,
                     Nome = model.Nome,
                     Sobrenome = model.Sobrenome,
+                    CPF = Regex.Replace(model.CPF, "[^0-9]+", ""),
                     Telefone = model.Telefone
                 });
 
-           
                 return Json("Cadastro efetuado com sucesso");
             }
         }
@@ -60,8 +69,41 @@ namespace WebAtividadeEntrevista.Controllers
         [HttpPost]
         public JsonResult Alterar(ClienteModel model)
         {
+            var beneficiario = new Beneficiario();
             BoCliente bo = new BoCliente();
-       
+            BoBeneficiario boBeneficiario = new BoBeneficiario();
+
+            if (!CpfHelper.CpfIsValid(model.CPF))
+                ModelState.AddModelError("CPF", "CPF inválido.");
+
+            if (bo.VerificarExistencia(model.CPF, model.Id))
+                ModelState.AddModelError("CPF", "CPF Já está cadastrado.");
+
+            foreach (var beneficiarios in model.Beneficiarios)
+            {
+                if (!CpfHelper.CpfIsValid(beneficiarios.CPF))
+                {
+                    ModelState.AddModelError("CPF", "CPF inválido.");
+                    break;
+                }
+
+                else if (boBeneficiario.VerificarExistencia(beneficiarios.CPF, model.Id))
+                {
+                    ModelState.AddModelError("CPF", "CPF do Beneficiário já está cadastrado.");
+                    break;
+                }
+
+                else
+                {
+                    beneficiario.Nome = beneficiarios.Nome;
+                    beneficiario.CPF = Regex.Replace(beneficiarios.CPF, "[^0-9]+", "");
+                    beneficiario.IdCLiente = model.Id;
+
+                    boBeneficiario.InserirBeneficiario(beneficiario);
+
+                }
+            }
+
             if (!this.ModelState.IsValid)
             {
                 List<string> erros = (from item in ModelState.Values
@@ -84,9 +126,10 @@ namespace WebAtividadeEntrevista.Controllers
                     Nacionalidade = model.Nacionalidade,
                     Nome = model.Nome,
                     Sobrenome = model.Sobrenome,
+                    CPF = Regex.Replace(model.CPF, "[^0-9]+", ""),
                     Telefone = model.Telefone
                 });
-                               
+
                 return Json("Cadastro alterado com sucesso");
             }
         }
@@ -96,6 +139,8 @@ namespace WebAtividadeEntrevista.Controllers
         {
             BoCliente bo = new BoCliente();
             Cliente cliente = bo.Consultar(id);
+            BoBeneficiario beneficiario = new BoBeneficiario();
+            List<Beneficiario> beneficiarios = beneficiario.Listar(id);
             Models.ClienteModel model = null;
 
             if (cliente != null)
@@ -111,7 +156,9 @@ namespace WebAtividadeEntrevista.Controllers
                     Nacionalidade = cliente.Nacionalidade,
                     Nome = cliente.Nome,
                     Sobrenome = cliente.Sobrenome,
-                    Telefone = cliente.Telefone
+                    CPF = cliente.CPF,
+                    Telefone = cliente.Telefone,
+                    Beneficiarios = beneficiarios
                 };
 
             
